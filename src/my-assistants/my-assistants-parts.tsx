@@ -12,10 +12,12 @@ export function StartScreen({ onAdd }: { onAdd: () => void }) {
       <div className="flex flex-col items-center gap-spacing-lg">
         <Typography.Heading.OneB as="h2">У тебя пока нет ассистентов</Typography.Heading.OneB>
         {/* Объясняем, кто такой ассистент: раздел открывают редко, многие — впервые. */}
-        <Typography.Body.TwoR as="p" className="max-w-[480px]" color="secondary">
+        <Typography.Body.TwoR as="p" className="max-w-[680px]" color="secondary">
           Ассистент — сотрудник, которому ты передаёшь часть работы с заявками: он сможет создавать
-          заявки от твоего имени и согласовывать заявки твоих сотрудников. Добавь сотрудника и
-          выбери, какие полномочия ему выдать и на какой срок.
+          заявки от твоего имени и согласовывать заявки твоих сотрудников
+        </Typography.Body.TwoR>
+        <Typography.Body.TwoR as="p" color="secondary">
+          Добавь сотрудника и выбери полномочия и срок
         </Typography.Body.TwoR>
       </div>
       <Button onClick={onAdd} size="large">
