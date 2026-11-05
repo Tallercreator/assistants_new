@@ -125,9 +125,10 @@ export function GroupRow({
                   onCheckedChange={(value) => onChange(setGroup(role, rights, i, j, value))}
                   tone="lime"
                 />
+                {/* Часть прав группы: переключатель выключен, подпись объясняет почему. */}
                 {state.some && !state.all ? (
-                  <Typography.Caption.OneR color="tertiary">
-                    {state.enabled}/{cells.length}
+                  <Typography.Caption.OneR className="text-center" color="tertiary">
+                    включено {state.enabled} из {cells.length}
                   </Typography.Caption.OneR>
                 ) : null}
               </span>
