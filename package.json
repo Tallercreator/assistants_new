@@ -1,0 +1,35 @@
+{
+  "name": "assistants-new",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "config": {
+    "kitDir": "../../Space Design System/space-ui-kit",
+    "pagesRepo": "Tallercreator/assistants_new"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "kit:update": "node scripts/kit-update.mjs",
+    "deploy": "node scripts/deploy.mjs"
+  },
+  "dependencies": {
+    "@otp/space-ui-kit": "file:vendor/otp-space-ui-kit-0.9.0.tgz",
+    "clsx": "^2.1.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.2",
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
+    "@vitejs/plugin-react": "^6.0.1",
+    "tailwindcss": "4.3.2",
+    "typescript": "^5.9.0",
+    "vite": "^8.0.0"
+  }
+}

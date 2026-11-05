@@ -1,0 +1,31 @@
+/*
+ * Порядок слоёв — как в fixtures/consumer-contract кита, но собранный styles.css кита
+ * подключается ДО утилит прототипа. Иначе его базовые утилиты (.hidden, .flex-col…) стоят
+ * в слое utilities позже адаптивных классов демо и перебивают их (xl:flex, md:flex-row).
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "@otp/space-ui-kit/tokens.css" layer(theme);
+@import "@otp/space-ui-kit/fonts.css" layer(base);
+@import "@otp/space-ui-kit/styles.css";
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@import "@otp/space-ui-kit/theme.css";
+
+/*
+ * Код прототипа и собранный JS кита сканируются одним проходом: классы кита и демо выходят
+ * в общем порядке Tailwind, как в Storybook кита, и вариант демо не проигрывает базе кита.
+ */
+@source "./**/*.tsx";
+@source "../node_modules/@otp/space-ui-kit/dist/esm/**/*.js";
+
+/* В ките нет preflight: базовый фон и шрифт страницы задаём сами. */
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+body {
+  font-family: var(--font-primary, "Onest Variable", system-ui, sans-serif);
+}
