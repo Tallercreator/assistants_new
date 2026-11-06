@@ -41,8 +41,9 @@ export function ActionsMenu({
           </IconButton>
         }
       />
-      <PopoverContent align="end" aria-label="Действия с ассистентом" className="p-spacing-no">
-        <Dropdown className="w-[300px]">
+      {/* Dropdown — сам подложка меню (макет: 344, радиус 12, обводка): у поповера своей нет. */}
+      <PopoverContent align="end" aria-label="Действия с ассистентом" surface="none">
+        <Dropdown>
           {/* Новый ассистент ещё не сохранён: править уже открыто, приостанавливать и копировать
               нечего — эти пункты не показываем, остаётся только «Удалить ассистента». */}
           {fieldEditing ? null : (

@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 import { Button } from "@otp/space-ui-kit/button";
 import { Toast } from "@otp/space-ui-kit/toast";
 import { Typography } from "@otp/space-ui-kit/typography";
@@ -33,7 +35,8 @@ export type AssistantPanelProps = {
   onTogglePause: () => void;
   onDuplicate: () => void;
   onCancel: () => void;
-  onSave: () => void;
+  /** false — в полях ошибки: карточка прокручивается к первому незаполненному полю. */
+  onSave: () => boolean;
   /** Есть несохранённые изменения: копировать можно только сохранённые полномочия. */
   dirty: boolean;
   /** Вид прав в матрице: переключатели или чекбоксы. */
@@ -101,10 +104,22 @@ const footerClassName =
 /** Карточка ассистента по макету 41301:170920: профиль, срок, матрица и панель сохранения. */
 export function AssistantPanel(props: AssistantPanelProps) {
   const { assistant, dirty, draft, employee, errors, fieldEditing, onCancel } = props;
+  const articleRef = useRef<HTMLElement>(null);
+  const save = () => {
+    if (props.onSave()) return;
+    // Ошибки появляются после перерисовки: поле с aria-invalid ищем следующей задачей.
+    setTimeout(() => {
+      const field = articleRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      field?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+      field?.focus({ preventScroll: true });
+    }, 0);
+  };
   return (
     // Полоса прокрутки 8px внутри карточки, как в макете (.Dropdown Scroll area); место под неё
     // зарезервировано, справа отступ 8 + полоса 8 = те же 16, что сверху, и ширина не прыгает.
     <article
+      ref={articleRef}
       aria-label={`Ассистент: ${employee.name}`}
       className="relative box-border flex min-w-unit-0 flex-col gap-spacing-exxxs rounded-radius-lg bg-base-surface-primary-block-normal p-spacing-xl lg:min-h-unit-0 lg:overflow-y-auto lg:pr-spacing-md lg:[scrollbar-gutter:stable] lg:[&::-webkit-scrollbar]:w-[8px] lg:[&::-webkit-scrollbar-thumb]:rounded-radius-lg lg:[&::-webkit-scrollbar-thumb]:bg-base-surface-tertiary-neutral-pressed lg:[&::-webkit-scrollbar-track]:bg-transparent"
     >
@@ -153,7 +168,7 @@ export function AssistantPanel(props: AssistantPanelProps) {
             <Button onClick={onCancel} size="medium" variant="secondary">
               Отменить
             </Button>
-            <Button onClick={props.onSave} size="medium">
+            <Button onClick={save} size="medium">
               Сохранить
             </Button>
           </div>

@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 
 import { ChevronDownLine24Icon } from "@otp/space-ui-kit/icons/chevron-down-line-24";
+import { TrashLine24Icon } from "@otp/space-ui-kit/icons/trash-line-24";
 import { Button } from "@otp/space-ui-kit/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@otp/space-ui-kit/collapsible";
+import { IconButton } from "@otp/space-ui-kit/icon-button";
 import { Toast } from "@otp/space-ui-kit/toast";
 import { Typography } from "@otp/space-ui-kit/typography";
 import { badge, countLabel } from "./my-assistants-labels";
@@ -18,6 +20,7 @@ type AssistantListProps = {
   employees: Employee[];
   selectedId: string | null;
   onAdd: () => void;
+  onDelete: (assistant: Assistant) => void;
   onSelect: (id: string) => void;
 };
 
@@ -29,28 +32,33 @@ type SectionProps = Omit<AssistantListProps, "assistants" | "onAdd"> & {
   action?: ReactNode;
 };
 
-/** Карточка ассистента (макет 41296:126243): ФИО, название, бейдж срока внизу; удаление — в меню «…». */
+/**
+ * Карточка ассистента (макет 41296:126243): ФИО, название, бейдж срока внизу. Корзина — соседняя
+ * кнопка поверх угла (не внутри кнопки карточки): видна при наведении и фокусе, на тач-экранах — всегда.
+ */
 function AssistantCard({
   assistant,
   employee,
+  onDelete,
   onSelect,
   selected,
 }: {
   assistant: Assistant;
   employee?: Employee;
+  onDelete: (assistant: Assistant) => void;
   onSelect: (id: string) => void;
   selected: boolean;
 }) {
   const { label, status } = badge(assistant);
   return (
-    <li>
+    <li className="group/card relative">
       <button
         aria-current={selected ? "true" : undefined}
         className={cn(
-          "m-[0px] box-border flex w-full cursor-pointer appearance-none flex-col items-start gap-spacing-lg rounded-radius-md border border-solid p-spacing-lg text-left outline-none ui-transition-colors focus-visible:ring-(length:--ui-stroke-focus) focus-visible:ring-ring/50",
+          "m-[0px] box-border flex w-full cursor-pointer appearance-none flex-col items-start gap-spacing-lg rounded-radius-md border border-solid p-spacing-lg pr-[60px] text-left outline-none ui-transition-colors focus-visible:ring-(length:--ui-stroke-focus) focus-visible:ring-ring/50",
           selected
             ? "border-base-surface-primary-background bg-base-surface-primary-background"
-            : "border-base-border-standard-neutral-light-normal bg-base-surface-primary-block-normal hover:bg-base-surface-tertiary-neutral-normal",
+            : "border-base-border-standard-neutral-light-normal bg-base-surface-primary-block-normal group-hover/card:bg-base-surface-tertiary-neutral-normal",
         )}
         onClick={() => onSelect(assistant.id)}
         type="button"
@@ -72,12 +80,30 @@ function AssistantCard({
           ) : null}
         </span>
       </button>
+      <IconButton
+        aria-label={`Удалить ассистента ${employee?.name ?? ""}`}
+        className="absolute top-spacing-md right-spacing-md opacity-0 ui-transition-opacity group-hover/card:opacity-100 focus-visible:opacity-100 pointer-coarse:opacity-100"
+        onClick={() => onDelete(assistant)}
+        size="medium"
+        variant="ghost"
+      >
+        <TrashLine24Icon aria-hidden="true" />
+      </IconButton>
     </li>
   );
 }
 
 /** Сворачиваемая секция «Активные» / «Приостановлены» (Деск_Body_list, макет 41296:126243). */
-function Section({ action, employees, items, kind, onSelect, selectedId, title }: SectionProps) {
+function Section({
+  action,
+  employees,
+  items,
+  kind,
+  onDelete,
+  onSelect,
+  selectedId,
+  title,
+}: SectionProps) {
   return (
     <Collapsible
       // Пустая секция стоит свёрнутой, а с первым ассистентом раскрывается.
@@ -110,6 +136,7 @@ function Section({ action, employees, items, kind, onSelect, selectedId, title }
                 key={assistant.id}
                 assistant={assistant}
                 employee={employees.find((e) => e.id === assistant.employeeId)}
+                onDelete={onDelete}
                 onSelect={onSelect}
                 selected={assistant.id === selectedId}
               />

@@ -51,6 +51,7 @@ export function MyAssistantsDemo({ initialState = "saved", ...props }: MyAssista
             assistants={assistants}
             employees={employees}
             onAdd={openPicker}
+            onDelete={(assistant) => actions.setConfirm({ kind: "delete", assistant })}
             onSelect={actions.select}
             selectedId={selected.id}
           />
