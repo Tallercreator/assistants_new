@@ -111,8 +111,9 @@ export function AssistantPanel(props: AssistantPanelProps) {
     setTimeout(() => {
       const field = articleRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      // Только прокрутка, без фокуса: пустое поле с ошибкой в фокусе по гайду кита серое,
+      // а без фокуса все незаполненные поля одинаково красные.
       field?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
-      field?.focus({ preventScroll: true });
     }, 0);
   };
   return (
