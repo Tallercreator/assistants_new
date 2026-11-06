@@ -46,7 +46,8 @@ export function MyAssistantsDemo({ initialState = "saved", ...props }: MyAssista
         // На десктопе рабочая область — ровно экран под шапкой (72 + отступы 16 + 16): страница не
         // скроллится, список и карточка прокручиваются каждый внутри себя.
         // Колонка списка не уже 420px: в шапке «Активных» помещаются счётчик и кнопка добавления.
-        <div className="box-border grid items-start gap-spacing-xl rounded-radius-xxl bg-base-surface-primary-background p-spacing-md lg:h-[calc(100vh-104px)] lg:grid-cols-[minmax(420px,506fr)_minmax(0,1040fr)] lg:items-stretch lg:overflow-hidden">
+        // Между колонками 8px, как между секциями списка; полоса прокрутки списка встаёт в этот зазор.
+        <div className="box-border grid items-start gap-spacing-md rounded-radius-xxl bg-base-surface-primary-background p-spacing-md lg:h-[calc(100vh-104px)] lg:grid-cols-[minmax(420px,506fr)_minmax(0,1040fr)] lg:items-stretch lg:overflow-hidden">
           <AssistantList
             assistants={assistants}
             employees={employees}

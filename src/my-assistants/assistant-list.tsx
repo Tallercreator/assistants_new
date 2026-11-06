@@ -152,7 +152,7 @@ function Section({
 
 /**
  * Колонка списка: «Добавить ассистента» в шапке «Активных», секции прокручиваются.
- * Полоса прокрутки 8px вынесена в зазор между колонками (-mr + gutter), карточки до панели — 16px.
+ * Полоса прокрутки 8px вынесена в зазор между колонками (-mr + gutter), карточки до панели — 8px.
  */
 export function AssistantList({ assistants, onAdd, ...props }: AssistantListProps) {
   return (
