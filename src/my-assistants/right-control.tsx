@@ -19,7 +19,10 @@ type RightControlProps = {
   onCheckedChange?: (checked: boolean) => void;
 };
 
-/** Право в матрице: Toggle или Checkbox кита с одинаковыми именем и поведением. */
+/**
+ * Право в матрице: Toggle или Checkbox кита с одинаковыми именем и поведением. По центру строки:
+ * у отмеченного чекбокса появляется галочка, и по базовой линии он подпрыгивал бы на 2px.
+ */
 export function RightControl({ indeterminate = false, label, ...props }: RightControlProps) {
   const control = useContext(RightsControlContext);
   return control === "checkbox" ? (
@@ -28,11 +31,12 @@ export function RightControl({ indeterminate = false, label, ...props }: RightCo
       indeterminate={indeterminate}
       onCheckedChange={(checked) => props.onCheckedChange?.(checked)}
       checked={props.checked}
+      className="align-middle"
       disabled={props.disabled}
       tone="lime"
     />
   ) : (
-    <Toggle aria-label={label} tone="lime" {...props} />
+    <Toggle aria-label={label} className="align-middle" tone="lime" {...props} />
   );
 }
 

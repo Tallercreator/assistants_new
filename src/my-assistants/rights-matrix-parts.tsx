@@ -104,7 +104,7 @@ export function GroupRow({
         return (
           <td key={j} className={cn(cellClassName, noLine, "text-center")}>
             {isGroupAvailable(role, i, j) ? (
-              <span className="inline-flex flex-col items-center gap-spacing-xxs">
+              <span className="relative inline-flex align-middle">
                 <RightControl
                   checked={state.all}
                   disabled={disabled}
@@ -112,9 +112,14 @@ export function GroupRow({
                   label={`${group.title}: все заявки, ${columns[j].label}`}
                   onCheckedChange={(value) => onChange(setGroup(role, rights, i, j, value))}
                 />
-                {/* Часть прав группы: контрол не отмечен целиком, подпись объясняет почему. */}
+                {/* Часть прав группы: контрол не отмечен целиком, подпись объясняет почему. Подпись
+                    висит в нижнем отступе ячейки (14 + 2 ≤ 16) и не растит строку: иначе всё ниже
+                    съезжало при каждом клике по праву внутри группы. */}
                 {state.some && !state.all ? (
-                  <Typography.Caption.OneR className="text-center" color="tertiary">
+                  <Typography.Caption.OneR
+                    className="absolute top-full left-1/2 mt-spacing-xxs -translate-x-1/2 whitespace-nowrap"
+                    color="tertiary"
+                  >
                     включено {state.enabled} из {cells.length}
                   </Typography.Caption.OneR>
                 ) : null}

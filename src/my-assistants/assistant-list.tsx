@@ -129,7 +129,9 @@ function Section({
       </div>
       {items.length ? (
         // Тайминги раскрытия — как у Accordion кита: высота из --collapsible-panel-height (Base UI).
-        <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden ui-transition-accordion-expand data-closed:h-unit-0 data-closed:opacity-0 data-ending-style:h-unit-0 data-ending-style:opacity-0 data-ending-style:ui-transition-accordion-collapse data-starting-style:h-unit-0 data-starting-style:opacity-0 motion-reduce:ui-transition-none">
+        // Без нулевой высоты по data-closed: Base UI ставит data-closed в первом же кадре закрытия, и высота
+        // обнулялась бы до анимации — сворачивание дёргалось.
+        <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden ui-transition-accordion-expand data-ending-style:h-unit-0 data-ending-style:opacity-0 data-ending-style:ui-transition-accordion-collapse data-starting-style:h-unit-0 data-starting-style:opacity-0 motion-reduce:ui-transition-none">
           <ul className="m-[0px] flex list-none flex-col gap-spacing-md p-[0px] pt-spacing-xxxl">
             {items.map((assistant) => (
               <AssistantCard
