@@ -35,9 +35,11 @@ export function badge(assistant: Assistant): {
     return { label: `Приостановлен с ${formatDate(pausedAt ?? start)}`, status: "neutral" };
   const warning = expiryWarning(assistant);
   if (warning) return { label: warning, status: "attention" };
-  const label =
+  const period =
     end && !indefinite ? `с ${formatDate(start)} до ${formatDate(end)}` : `с ${formatDate(start)}`;
-  return { label, status: "positive" };
+  // Макет 41296:126243: «Активен …» — права уже действуют; срок в будущем — серый, без слова.
+  if (start > DEMO_TODAY) return { label: period, status: "neutral" };
+  return { label: `Активен ${period}`, status: "positive" };
 }
 
 /** Подпись в футере правки: сколько прав отличается от сохранённых. */

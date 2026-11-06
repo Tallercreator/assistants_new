@@ -6,8 +6,6 @@ import { ChevronDownLine16Icon } from "@otp/space-ui-kit/icons/chevron-down-line
 import { DocumentLine24Icon } from "@otp/space-ui-kit/icons/document-line-24";
 import { HeartPharmacyLine24Icon } from "@otp/space-ui-kit/icons/heart-pharmacy-line-24";
 import { UserLine24Icon } from "@otp/space-ui-kit/icons/user-line-24";
-import { Toggle } from "@otp/space-ui-kit/toggle";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@otp/space-ui-kit/tooltip";
 import { Typography } from "@otp/space-ui-kit/typography";
 import {
   cellsState,
@@ -21,6 +19,7 @@ import {
   type RightColumn,
   type Rights,
 } from "./my-assistants-model";
+import { LockedControl, RightControl } from "./right-control";
 import { cn } from "./utils";
 
 /** Строки на линиях (макет 41273:109662): отступ 12 по горизонтали, 8 + 12 до разделителя по вертикали. */
@@ -36,26 +35,6 @@ const GROUP_ICONS: ComponentType<SVGProps<SVGSVGElement>>[] = [
   AirplaneLine24Icon,
 ];
 
-type LockedToggleProps = { checked: boolean; label: string; reason: string };
-
-/**
- * Недоступное право: выключенный тоггл с причиной в имени и в подсказке при наведении.
- * Обёртка не фокусируется: вложенный фокусируемый контейнер у switch запрещён axe,
- * а для скринридера причина уже входит в имя самого тоггла.
- */
-export function LockedToggle({ checked, label, reason }: LockedToggleProps) {
-  return (
-    <Tooltip>
-      <TooltipTrigger render={<span className="inline-flex cursor-not-allowed" />}>
-        <Toggle aria-label={`${label} — ${reason}`} checked={checked} disabled tone="lime" />
-      </TooltipTrigger>
-      <TooltipContent side="top" tone="lighter">
-        {reason}
-      </TooltipContent>
-    </Tooltip>
-  );
-}
-
 export type RowsProps = {
   group: number;
   role: AssistantRole;
@@ -63,6 +42,8 @@ export type RowsProps = {
   onChange: (rights: Rights) => void;
   /** Пауза: переключатели показывают выданные права, но не меняются. */
   disabled?: boolean;
+  /** Последняя группа таблицы: под её нижней строкой разделитель не рисуем. */
+  last?: boolean;
   /** Показанные столбцы: пустой у роли столбец скрыт целиком. */
   visible: RightColumn[];
 };
@@ -73,6 +54,7 @@ type GroupRowProps = RowsProps & { open: boolean; panelId: string; onToggle: () 
 export function GroupRow({
   disabled,
   group: i,
+  last,
   onChange,
   onToggle,
   open,
@@ -83,9 +65,14 @@ export function GroupRow({
 }: GroupRowProps) {
   const group = requestGroups[i];
   const Icon = GROUP_ICONS[i];
+  // Свёрнутая последняя группа — низ таблицы: разделитель под ней лишний.
+  const noLine = last && !open && "border-b-0";
   return (
     <tr>
-      <th className={cn(cellClassName, "text-left font-font-weight-regular")} scope="rowgroup">
+      <th
+        className={cn(cellClassName, noLine, "text-left font-font-weight-regular")}
+        scope="rowgroup"
+      >
         {group.expandable === false ? (
           // Права на группу выдаются сразу на все заявки — раскрывать нечего.
           <span className="flex w-full items-center gap-spacing-lg text-base-texticons-secondary">
@@ -115,17 +102,17 @@ export function GroupRow({
         const cells = groupCells(role, rights, i, j);
         const state = cellsState(cells);
         return (
-          <td key={j} className={cn(cellClassName, "text-center")}>
+          <td key={j} className={cn(cellClassName, noLine, "text-center")}>
             {isGroupAvailable(role, i, j) ? (
               <span className="inline-flex flex-col items-center gap-spacing-xxs">
-                <Toggle
-                  aria-label={`${group.title}: все заявки, ${columns[j].label}`}
+                <RightControl
                   checked={state.all}
                   disabled={disabled}
+                  indeterminate={state.some && !state.all}
+                  label={`${group.title}: все заявки, ${columns[j].label}`}
                   onCheckedChange={(value) => onChange(setGroup(role, rights, i, j, value))}
-                  tone="lime"
                 />
-                {/* Часть прав группы: переключатель выключен, подпись объясняет почему. */}
+                {/* Часть прав группы: контрол не отмечен целиком, подпись объясняет почему. */}
                 {state.some && !state.all ? (
                   <Typography.Caption.OneR className="text-center" color="tertiary">
                     включено {state.enabled} из {cells.length}
@@ -133,7 +120,7 @@ export function GroupRow({
                 ) : null}
               </span>
             ) : (
-              <LockedToggle
+              <LockedControl
                 checked={false}
                 label={`${group.title}: ${columns[j].label}`}
                 reason={groupUnavailableReason(i, j)}

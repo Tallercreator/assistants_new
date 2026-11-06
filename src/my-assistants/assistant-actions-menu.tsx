@@ -17,7 +17,7 @@ type ActionsMenuProps = Pick<
   "assistant" | "dirty" | "fieldEditing" | "onDelete" | "onDuplicate" | "onEdit" | "onTogglePause"
 >;
 
-/** Меню «…» карточки: действия без акцентных цветов, как в v17. */
+/** Меню «…» карточки (макет 41296:127688): удаление красное, недоступные пункты объяснены или скрыты. */
 export function ActionsMenu({
   assistant,
   dirty,
@@ -32,7 +32,6 @@ export function ActionsMenu({
     setOpen(false);
     action();
   };
-  const copyBlocked = assistant.pending || dirty;
   return (
     <Popover onOpenChange={setOpen} open={open}>
       <PopoverTrigger
@@ -44,40 +43,42 @@ export function ActionsMenu({
       />
       <PopoverContent align="end" aria-label="Действия с ассистентом" className="p-spacing-no">
         <Dropdown className="w-[300px]">
-          <DropdownItem
-            disabled={fieldEditing || assistant.paused}
-            left={<PenLine24Icon aria-hidden="true" />}
-            onClick={run(onEdit)}
-          >
-            Редактировать
-          </DropdownItem>
-          <DropdownItem
-            disabled={assistant.pending}
-            left={
-              assistant.paused ? (
-                <PlayLine24Icon aria-hidden="true" />
-              ) : (
-                <ClockLine24Icon aria-hidden="true" />
-              )
-            }
-            onClick={run(onTogglePause)}
-          >
-            {assistant.paused ? "Возобновить полномочия" : "Приостановить полномочия"}
-          </DropdownItem>
-          <DropdownItem
-            description={
-              assistant.pending
-                ? "Станет доступно после сохранения полномочий"
-                : dirty
-                  ? "Сначала сохрани или отмени изменения"
-                  : undefined
-            }
-            disabled={copyBlocked}
-            left={<CopyLine24Icon aria-hidden="true" />}
-            onClick={run(onDuplicate)}
-          >
-            Дублировать полномочия
-          </DropdownItem>
+          {/* Новый ассистент ещё не сохранён: править уже открыто, приостанавливать и копировать
+              нечего — эти пункты не показываем, остаётся только «Удалить ассистента». */}
+          {fieldEditing ? null : (
+            <DropdownItem
+              description={assistant.paused ? "Сначала возобнови полномочия" : undefined}
+              disabled={assistant.paused}
+              left={<PenLine24Icon aria-hidden="true" />}
+              onClick={run(onEdit)}
+            >
+              Редактировать
+            </DropdownItem>
+          )}
+          {assistant.pending ? null : (
+            <>
+              <DropdownItem
+                left={
+                  assistant.paused ? (
+                    <PlayLine24Icon aria-hidden="true" />
+                  ) : (
+                    <ClockLine24Icon aria-hidden="true" />
+                  )
+                }
+                onClick={run(onTogglePause)}
+              >
+                {assistant.paused ? "Возобновить полномочия" : "Приостановить полномочия"}
+              </DropdownItem>
+              <DropdownItem
+                description={dirty ? "Сначала сохрани или отмени изменения" : undefined}
+                disabled={dirty}
+                left={<CopyLine24Icon aria-hidden="true" />}
+                onClick={run(onDuplicate)}
+              >
+                Дублировать полномочия
+              </DropdownItem>
+            </>
+          )}
           <DropdownItem
             left={<TrashLine24Icon aria-hidden="true" />}
             onClick={run(onDelete)}

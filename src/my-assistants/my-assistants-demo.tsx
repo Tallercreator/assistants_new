@@ -11,7 +11,7 @@ import type { AssistantRole } from "./my-assistants-model";
 import { ConfirmDialog, StartScreen } from "./my-assistants-parts";
 import { MyAssistantsShell } from "./my-assistants-shell";
 import { ResumeDialog } from "./resume-dialog";
-import { ScenarioSwitch } from "./scenario-switch";
+import { ScenarioSwitch, type PrototypeOptions } from "./scenario-switch";
 import { useMyAssistants } from "./use-my-assistants";
 
 export type MyAssistantsDemoProps = {
@@ -23,8 +23,13 @@ export type MyAssistantsDemoProps = {
 
 /** Демо «Мои ассистенты» по макетам на новой ДС (Figma 41301:181913). */
 export function MyAssistantsDemo({ initialState = "saved", ...props }: MyAssistantsDemoProps) {
-  // Начальная роль — из пропса, дальше её меняет кнопка «Сценарий» в шапке.
-  const [role, setRole] = useState<AssistantRole>(props.role ?? "smt");
+  // Начальная роль — из пропса, дальше роль, вид прав и кнопки выбора меняет «Сценарий» в шапке.
+  const [options, setOptions] = useState<PrototypeOptions>({
+    control: "toggle",
+    pickerButtons: false,
+    role: props.role ?? "smt",
+  });
+  const { role } = options;
   const state = useMyAssistants(role, initialState);
   const { actions, assistants, confirm, dirty, draft, errors, fieldEditing, selected } = state;
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -36,21 +41,22 @@ export function MyAssistantsDemo({ initialState = "saved", ...props }: MyAssista
   const openPicker = () => actions.guard(() => setPickerOpen(true));
 
   return (
-    <MyAssistantsShell scenario={<ScenarioSwitch onRoleChange={setRole} role={role} />}>
+    <MyAssistantsShell scenario={<ScenarioSwitch onOptionsChange={setOptions} options={options} />}>
       {selected && draft && selectedEmployee ? (
         // На десктопе рабочая область — ровно экран под шапкой (72 + отступы 16 + 16): страница не
         // скроллится, список и карточка прокручиваются каждый внутри себя.
-        <div className="box-border grid items-start gap-spacing-xl rounded-radius-xxl bg-base-surface-primary-background p-spacing-md lg:h-[calc(100vh-104px)] lg:grid-cols-[minmax(300px,506fr)_minmax(0,1040fr)] lg:items-stretch lg:overflow-hidden">
+        // Колонка списка не уже 420px: в шапке «Активных» помещаются счётчик и кнопка добавления.
+        <div className="box-border grid items-start gap-spacing-xl rounded-radius-xxl bg-base-surface-primary-background p-spacing-md lg:h-[calc(100vh-104px)] lg:grid-cols-[minmax(420px,506fr)_minmax(0,1040fr)] lg:items-stretch lg:overflow-hidden">
           <AssistantList
             assistants={assistants}
             employees={employees}
             onAdd={openPicker}
-            onDelete={(assistant) => actions.setConfirm({ kind: "delete", assistant })}
             onSelect={actions.select}
             selectedId={selected.id}
           />
           <AssistantPanel
             assistant={selected}
+            control={options.control}
             dirty={dirty}
             draft={draft}
             employee={selectedEmployee}
@@ -76,6 +82,7 @@ export function MyAssistantsDemo({ initialState = "saved", ...props }: MyAssista
         onAdd={actions.add}
         onOpenChange={setPickerOpen}
         open={pickerOpen}
+        withButtons={options.pickerButtons}
       />
       <DuplicateDialog
         employees={employees}
